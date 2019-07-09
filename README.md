@@ -28,4 +28,4 @@ keep the structure
 
   stop publishing of ros dynamic pararmeters
 
-keep the topic `/diagnostic` (in rsdriver.cpp 102, 128-130)
+keep the topic `/diagnostic` (in rsdriver.cpp 102, 128-130, 205-207)

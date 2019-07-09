@@ -15,10 +15,11 @@
 #include "rsdriver.h"
 #include <rslidar_msgs/rslidarScan.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 namespace rslidar_driver
 {
-rslidarDriver::rslidarDriver(ros::NodeHandle node, ros::NodeHandle private_nh)
+rslidarDriver::rslidarDriver(ros::NodeHandle node, ros::NodeHandle private_nh):data_(new rslidar_rawdata::RawData())
 {
   // use private node handle to get parameters
   private_nh.param("frame_id", config_.frame_id, std::string("rslidar"));
@@ -98,10 +99,11 @@ rslidarDriver::rslidarDriver(ros::NodeHandle node, ros::NodeHandle private_nh)
   // srv_->setCallback(f);  // Set callback function und call initially
 
   // initialize diagnostics
-  diagnostics_.setHardwareID(deviceName);
-  const double diag_freq = packet_rate / config_.npackets;
-  diag_max_freq_ = diag_freq;
-  diag_min_freq_ = diag_freq;
+  // diagnostics_.setHardwareID(deviceName);
+  // const double diag_freq = packet_rate / config_.npackets;
+  // diag_max_freq_ = diag_freq;
+  // diag_min_freq_ = diag_freq;
+  
   // ROS_INFO("expected frequency: %.3f (Hz)", diag_freq);
 
   // open rslidar input device or file
@@ -116,20 +118,26 @@ rslidarDriver::rslidarDriver(ros::NodeHandle node, ros::NodeHandle private_nh)
  
 
   // raw packet output topic
-  std::string msop_output_packets;
-  private_nh.param("msop_output_packets",msop_output_packets,std::string("rslidar_packets"));
-  msop_output_ = node.advertise<rslidar_msgs::rslidarScan>(msop_output_packets, 10);
+  // std::string msop_output_packets;
+  // private_nh.param("msop_output_packets",msop_output_packets,std::string("rslidar_packets"));
+  // msop_output_ = node.advertise<rslidar_msgs::rslidarScan>(msop_output_packets, 10);
   // std::string difop_output_packets;
   // private_nh.param("difop_output_packets",difop_output_packets,std::string("rslidar_packets_difop"));
   // difop_output_ = node.advertise<rslidar_msgs::rslidarPacket>(difop_output_packets, 10);
   // difop_thread_ = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&rslidarDriver::difopPoll, this)));
-    using namespace diagnostic_updater;
   
-  std::string diag_topic_name;
-  diag_topic_name=msop_output_packets;
-  diag_topic_.reset(new TopicDiagnostic(diag_topic_name, diagnostics_,
-                                        FrequencyStatusParam(&diag_min_freq_, &diag_max_freq_, 0.1, 10),
-                                        TimeStampStatusParam()));
+  //   using namespace diagnostic_updater;
+  
+  // std::string diag_topic_name;
+  // diag_topic_name=msop_output_packets;
+  // diag_topic_.reset(new TopicDiagnostic(diag_topic_name, diagnostics_,
+  //                                       FrequencyStatusParam(&diag_min_freq_, &diag_max_freq_, 0.1, 10),
+  //                                       TimeStampStatusParam()));
+
+  private_nh.param("model", model_, std::string("RS16"));
+  data_->loadConfigFile(node, private_nh);
+  pointcloud_pub_ = node.advertise<sensor_msgs::PointCloud2>("/test/rjp", 1000);
+
 }
 
 /** poll the device
@@ -200,11 +208,45 @@ bool rslidarDriver::poll(void)
   ROS_DEBUG("Publishing a full rslidar scan.");
   scan->header.stamp = scan->packets.back().stamp;
   scan->header.frame_id = config_.frame_id;
-  msop_output_.publish(scan);
+
+  // rjp
+  pcl::PointCloud<pcl::PointXYZI>::Ptr outPoints(new pcl::PointCloud<pcl::PointXYZI>);
+  outPoints->header.stamp = pcl_conversions::toPCL(scan->header).stamp;
+  outPoints->header.frame_id = scan->header.frame_id;
+  outPoints->clear();
+  if (model_ == "RS16")
+  {
+    outPoints->height = 16;
+    outPoints->width = 24 * (int)scan->packets.size();
+    outPoints->is_dense = false;
+    outPoints->resize(outPoints->height * outPoints->width);
+  }
+  else if (model_ == "RS32")
+  {
+    outPoints->height = 32;
+    outPoints->width = 12 * (int)scan->packets.size();
+    outPoints->is_dense = false;
+    outPoints->resize(outPoints->height * outPoints->width);
+  }
+
+  // process each packet provided by the driver
+
+  data_->block_num = 0;
+  for (size_t i = 0; i < scan->packets.size(); ++i)
+  {
+    data_->unpack(scan->packets[i], outPoints);
+  }
+  sensor_msgs::PointCloud2 outMsg;
+  pcl::toROSMsg(*outPoints, outMsg);
+
+  pointcloud_pub_.publish(outMsg);
+
+
+  // msop_output_.publish(scan);
 
   // notify diagnostics that a message has been published, updating its status
-  diag_topic_->tick(scan->header.stamp);
-  diagnostics_.update();
+  // diag_topic_->tick(scan->header.stamp);
+  // diagnostics_.update();
 
   return true;
 }

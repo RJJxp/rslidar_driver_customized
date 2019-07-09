@@ -2,9 +2,18 @@ add_library(rslidar_input input.cc)
 target_link_libraries(rslidar_input
   ${catkin_LIBRARIES})
 
+# ==== added by rjp ========
+add_library(rslidar_data rawdata.cc)
+target_link_libraries(rslidar_data
+  ${catkin_LIBRARIES}
+  ${libpcap_LIBRARIES})
+# ==========================
+
+# modified by rjp rslidar_data
 add_library(rslidar_driver rsdriver.cpp)
 target_link_libraries(rslidar_driver
   rslidar_input
+  rslidar_data
   ${catkin_LIBRARIES})
 
 # build the nodelet version
@@ -27,7 +36,7 @@ target_link_libraries(rslidar_node
 )
 
 
-install(TARGETS rslidar_input rslidar_driver driver_nodelet rslidar_node 
+install(TARGETS  rslidar_data rslidar_input rslidar_driver driver_nodelet rslidar_node 
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

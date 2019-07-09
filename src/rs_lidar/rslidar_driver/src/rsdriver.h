@@ -26,6 +26,7 @@
 #include <pcl_ros/impl/transforms.hpp>
 #include <pcl_conversions/pcl_conversions.h>
 #include "input.h"
+#include "rawdata.h"
 
 namespace rslidar_driver
 {
@@ -66,7 +67,7 @@ private:
 
   boost::shared_ptr<Input> msop_input_;
   boost::shared_ptr<Input> difop_input_;
-  ros::Publisher msop_output_;
+  // ros::Publisher msop_output_;
   ros::Publisher difop_output_;
 
   // Converter convtor_;
@@ -77,6 +78,11 @@ private:
   boost::shared_ptr<diagnostic_updater::TopicDiagnostic> diag_topic_;
   boost::shared_ptr<boost::thread> difop_thread_;
 
+  // add rawdata by rjp
+  
+  boost::shared_ptr<rslidar_rawdata::RawData> data_;
+  ros::Publisher pointcloud_pub_;
+  std::string model_;
 };
 
 }  // namespace rslidar_driver
