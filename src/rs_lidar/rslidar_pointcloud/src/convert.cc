@@ -31,10 +31,10 @@ Convert::Convert(ros::NodeHandle node, ros::NodeHandle private_nh) : data_(new r
   private_nh.param("output_pointcloud_topic",output_pointcloud_topic,std::string("rslidar_points"));
   output_ = node.advertise<sensor_msgs::PointCloud2>(output_pointcloud_topic, 10);
 
-  srv_ = boost::make_shared<dynamic_reconfigure::Server<rslidar_pointcloud::CloudNodeConfig> >(private_nh);
-  dynamic_reconfigure::Server<rslidar_pointcloud::CloudNodeConfig>::CallbackType f;
-  f = boost::bind(&Convert::callback, this, _1, _2);
-  srv_->setCallback(f);
+  // srv_ = boost::make_shared<dynamic_reconfigure::Server<rslidar_pointcloud::CloudNodeConfig> >(private_nh);
+  // dynamic_reconfigure::Server<rslidar_pointcloud::CloudNodeConfig>::CallbackType f;
+  // f = boost::bind(&Convert::callback, this, _1, _2);
+  // srv_->setCallback(f);
 
   // subscribe to rslidarScan packets
   std::string subscribe_msop_packets;

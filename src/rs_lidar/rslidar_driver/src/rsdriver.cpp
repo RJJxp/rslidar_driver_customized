@@ -92,10 +92,10 @@ rslidarDriver::rslidarDriver(ros::NodeHandle node, ros::NodeHandle private_nh)
   config_.cut_angle = static_cast<int>(cut_angle * 100);
 
   // Initialize dynamic reconfigure
-  srv_ = boost::make_shared<dynamic_reconfigure::Server<rslidar_driver::rslidarNodeConfig> >(private_nh);
-  dynamic_reconfigure::Server<rslidar_driver::rslidarNodeConfig>::CallbackType f;
-  f = boost::bind(&rslidarDriver::callback, this, _1, _2);
-  srv_->setCallback(f);  // Set callback function und call initially
+  // srv_ = boost::make_shared<dynamic_reconfigure::Server<rslidar_driver::rslidarNodeConfig> >(private_nh);
+  // dynamic_reconfigure::Server<rslidar_driver::rslidarNodeConfig>::CallbackType f;
+  // f = boost::bind(&rslidarDriver::callback, this, _1, _2);
+  // srv_->setCallback(f);  // Set callback function und call initially
 
   // initialize diagnostics
   diagnostics_.setHardwareID(deviceName);
