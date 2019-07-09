@@ -1,0 +1,54 @@
+<launch>
+<group ns="/sensor/lidar16/left">
+  <node name="rslidar16_driver" pkg="rslidar_driver" type="rslidar_node" output="screen">
+    <param name="frame_id" value="rslidar" />
+    <param name="model" value="RS16" />
+    <param name="rpm" value="600" />
+    <param name="device_ip" value="192.168.1.201" />
+    <param name="msop_port" value="6688" />
+    <param name="difop_port" value="7788" />
+    <param name="cut_angle" value="-0.01" /> 
+    <param name="msop_output_packets" value="raw_msop_packets" />
+    <param name="difop_output_packets" value="raw_difop_pcakets" />
+  </node>
+
+
+  <node name="rslidar16_pointcloud" pkg="rslidar_pointcloud" type="cloud_node" output="screen" >
+    <param name="model" value="RS16"/>
+    <param name="output_pointcloud_topic" value="pointcloud" />
+    <param name="subscribe_msop_packets" value="raw_msop_packets" />
+    <param name="subscribe_difop_packets" value="raw_difop_packets" />
+    <param name="curves_path" value="$(find rslidar_pointcloud)/data/lidar1/curves.csv" />
+    <param name="angle_path" value="$(find rslidar_pointcloud)/data/lidar1/angle.csv"/>
+    <param name="channel_path" value="$(find rslidar_pointcloud)/data/lidar1/ChannelNum.csv" />
+  </node>
+
+</group>
+
+<group ns="/sensor/lidar16/right">
+  <node name="rslidar16_driver" pkg="rslidar_driver" type="rslidar_node" output="screen">
+    <param name="frame_id" value="rslidar" />
+    <param name="model" value="RS16" />
+    <param name="rpm" value="600" />
+    <param name="device_ip" value="192.168.1.200" />
+    <param name="msop_port" value="6699" />
+    <param name="difop_port" value="8877" />
+    <param name="cut_angle" value="-0.01" /> 
+    <param name="msop_output_packets" value="raw_msop_packets" />
+    <param name="difop_output_packets" value="raw_difop_pcakets" />
+  </node>
+
+
+  <node name="rslidar16_pointcloud" pkg="rslidar_pointcloud" type="cloud_node" output="screen" >
+    <param name="model" value="RS16"/>
+    <param name="output_pointcloud_topic" value="pointcloud" />
+    <param name="subscribe_msop_packets" value="raw_msop_packets" />
+    <param name="subscribe_difop_packets" value="raw_difop_packets" />
+    <param name="curves_path" value="$(find rslidar_pointcloud)/data/lidar2/curves.csv" />
+    <param name="angle_path" value="$(find rslidar_pointcloud)/data/lidar2/angle.csv"/>
+    <param name="channel_path" value="$(find rslidar_pointcloud)/data/lidar2/ChannelNum.csv" />
+  </node>
+
+</group>
+
+</launch>

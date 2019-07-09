@@ -1,0 +1,44 @@
+<launch>
+<group ns="/sensor/lidar16/right">
+  <!-- for rslidar_node /-->
+  <arg name="frame_id" default="rslidar" />
+  <arg name="model" default="RS16" />
+  <arg name="rpm" default="600" />
+  <!--arg name="pcap" default="" /-->
+  <!-- the right rslidar default device IP is 192.168.1.200-->
+  <!-- the left rslidar default device IP is 192.168.1.201-->
+  <arg name="device_ip" default="192.168.1.200" />
+  <arg name="msop_port" default="6699" />
+  <arg name="difop_port" default="7788" />
+  <arg name="cut_angle" default="-0.01" /> 
+  <arg name="msop_output_packets" default="rslidar_packets" />
+  <arg name="difop_output_packets" default="rslidar_packets_difop" />
+  <!-- for cloud_node /-->
+  <arg name="output_pointcloud_topic" default="rslidar_points" />
+  <arg name="subscribe_msop_packets" default="$(arg msop_output_packets)" />
+  <arg name="subscribe_difop_packets" default="$(arg difop_output_packets)" />
+  <arg name="lidar_param_path" default="$(find rslidar_pointcloud)/data/rs_lidar_16/"/>
+
+  <node  name="driver_node" pkg="rslidar_driver" type="rslidar_node" output="screen" >
+    <param name="model" value="$(arg model)"/>
+    <param name="device_ip" value="$(arg device_ip)"/>
+    <param name="msop_port" value="$(arg msop_port)"/>
+    <param name="difop_port" value="$(arg difop_port)"/>
+    <param name="msop_output_packets" value="raw_msop_packets"/>
+    <param name="difop_output_packets" value="raw_difop_packets" />
+    <!--param name="pcap" value="path_to_pcap"/-->
+  </node>
+
+  <node  name="cloud_node" pkg="rslidar_pointcloud" type="cloud_node" output="screen" >
+    <param name="model" value="$(arg model)"/>
+    <param name="output_pointcloud_topic" value="pointcloud" />
+    <param name="subscribe_msop_packets" value="raw_msop_packets" />
+    <param name="subscribe_difop_packets" value="raw_difop_packets" />
+    <param name="curves_path" value="$(arg lidar_param_path)/curves.csv" />
+    <param name="angle_path" value="$(arg lidar_param_path)/angle.csv" />
+    <param name="channel_path" value="$(arg lidar_param_path)/ChannelNum.csv" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz"  args="-d $(find rslidar_pointcloud)/rviz_cfg/rslidar.rviz" />
+</group>
+</launch>
