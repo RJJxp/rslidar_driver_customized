@@ -24,10 +24,6 @@ rslidarDriver::rslidarDriver(ros::NodeHandle node, ros::NodeHandle private_nh):d
   // use private node handle to get parameters
   private_nh.param("frame_id", config_.frame_id, std::string("rslidar"));
 
-  // std::string tf_prefix = tf::getPrefixParam(private_nh);
-  // ROS_DEBUG_STREAM("tf_prefix: " << tf_prefix);
-  // config_.frame_id = tf::resolve(tf_prefix, config_.frame_id);
-
   // get model name, validate string, determine packet rate
   private_nh.param("model", config_.model, std::string("RS16"));
   double packet_rate;  // packet frequency (Hz)
@@ -103,31 +99,16 @@ rslidarDriver::rslidarDriver(ros::NodeHandle node, ros::NodeHandle private_nh):d
   // const double diag_freq = packet_rate / config_.npackets;
   // diag_max_freq_ = diag_freq;
   // diag_min_freq_ = diag_freq;
-  
-  // ROS_INFO("expected frequency: %.3f (Hz)", diag_freq);
-
-  // open rslidar input device or file
-
-    // read data from packet capture file
-    // msop_input_.reset(new rslidar_driver::InputPCAP(private_nh, msop_udp_port, packet_rate, dump_file));
-    // difop_input_.reset(new rslidar_driver::InputPCAP(private_nh, difop_udp_port, packet_rate, dump_file));
 
     // read data from live socket
   msop_input_.reset(new rslidar_driver::InputSocket(private_nh, msop_udp_port));
   difop_input_.reset(new rslidar_driver::InputSocket(private_nh, difop_udp_port));
  
 
-  // raw packet output topic
-  // std::string msop_output_packets;
-  // private_nh.param("msop_output_packets",msop_output_packets,std::string("rslidar_packets"));
-  // msop_output_ = node.advertise<rslidar_msgs::rslidarScan>(msop_output_packets, 10);
-  // std::string difop_output_packets;
-  // private_nh.param("difop_output_packets",difop_output_packets,std::string("rslidar_packets_difop"));
-  // difop_output_ = node.advertise<rslidar_msgs::rslidarPacket>(difop_output_packets, 10);
-  // difop_thread_ = boost::shared_ptr<boost::thread>(new boost::thread(boost::bind(&rslidarDriver::difopPoll, this)));
   
   //   using namespace diagnostic_updater;
-  
+  // std::string msop_output_packets;
+  // private_nh.param("msop_output_packets",msop_output_packets,std::string("rslidar_packets"));
   // std::string diag_topic_name;
   // diag_topic_name=msop_output_packets;
   // diag_topic_.reset(new TopicDiagnostic(diag_topic_name, diagnostics_,
@@ -136,8 +117,9 @@ rslidarDriver::rslidarDriver(ros::NodeHandle node, ros::NodeHandle private_nh):d
 
   private_nh.param("model", model_, std::string("RS16"));
   data_->loadConfigFile(node, private_nh);
-  pointcloud_pub_ = node.advertise<sensor_msgs::PointCloud2>("/test/rjp", 1000);
-
+  std::string output_topic_name;
+  private_nh.param("output_pointcloud_topic", output_topic_name, std::string("pointcloud"));
+  pointcloud_pub_ = node.advertise<sensor_msgs::PointCloud2>(output_topic_name, 1000);
 }
 
 /** poll the device
@@ -241,9 +223,6 @@ bool rslidarDriver::poll(void)
 
   pointcloud_pub_.publish(outMsg);
 
-
-  // msop_output_.publish(scan);
-
   // notify diagnostics that a message has been published, updating its status
   // diag_topic_->tick(scan->header.stamp);
   // diagnostics_.update();
@@ -251,31 +230,10 @@ bool rslidarDriver::poll(void)
   return true;
 }
 
-// void rslidarDriver::difopPoll(void)
-// {
-//   // reading and publishing scans as fast as possible.
-//   rslidar_msgs::rslidarPacketPtr difop_packet_ptr(new rslidar_msgs::rslidarPacket);
-//   while (ros::ok())
-//   {
-//     // keep reading
-//     rslidar_msgs::rslidarPacket difop_packet_msg;
-//     int rc = difop_input_->getPacket(&difop_packet_msg, config_.time_offset);
-//     if (rc == 0)
-//     {
-//       // std::cout << "Publishing a difop data." << std::endl;
-//       ROS_DEBUG("Publishing a difop data.");
-//       *difop_packet_ptr = difop_packet_msg;
-//       difop_output_.publish(difop_packet_ptr);
-//     }
-//     if (rc < 0)
-//       return;  // end of file reached?
-//     ros::spinOnce();
-//   }
-// }
-
 void rslidarDriver::callback(rslidar_driver::rslidarNodeConfig& config, uint32_t level)
 {
   ROS_INFO("Reconfigure Request");
   config_.time_offset = config.time_offset;
 }
-}
+
+} // namespace rslidar_driver

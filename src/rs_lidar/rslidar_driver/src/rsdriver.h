@@ -45,7 +45,6 @@ public:
   }
 
   bool poll(void);
-  void difopPoll(void);
 
 private:
   /// Callback for dynamic reconfigure
@@ -67,10 +66,7 @@ private:
 
   boost::shared_ptr<Input> msop_input_;
   boost::shared_ptr<Input> difop_input_;
-  // ros::Publisher msop_output_;
-  // ros::Publisher difop_output_;
 
-  // Converter convtor_;
   /** diagnostics updater */
   // diagnostic_updater::Updater diagnostics_;
   // double diag_min_freq_;
