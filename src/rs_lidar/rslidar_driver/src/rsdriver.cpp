@@ -251,27 +251,27 @@ bool rslidarDriver::poll(void)
   return true;
 }
 
-void rslidarDriver::difopPoll(void)
-{
-  // reading and publishing scans as fast as possible.
-  rslidar_msgs::rslidarPacketPtr difop_packet_ptr(new rslidar_msgs::rslidarPacket);
-  while (ros::ok())
-  {
-    // keep reading
-    rslidar_msgs::rslidarPacket difop_packet_msg;
-    int rc = difop_input_->getPacket(&difop_packet_msg, config_.time_offset);
-    if (rc == 0)
-    {
-      // std::cout << "Publishing a difop data." << std::endl;
-      ROS_DEBUG("Publishing a difop data.");
-      *difop_packet_ptr = difop_packet_msg;
-      difop_output_.publish(difop_packet_ptr);
-    }
-    if (rc < 0)
-      return;  // end of file reached?
-    ros::spinOnce();
-  }
-}
+// void rslidarDriver::difopPoll(void)
+// {
+//   // reading and publishing scans as fast as possible.
+//   rslidar_msgs::rslidarPacketPtr difop_packet_ptr(new rslidar_msgs::rslidarPacket);
+//   while (ros::ok())
+//   {
+//     // keep reading
+//     rslidar_msgs::rslidarPacket difop_packet_msg;
+//     int rc = difop_input_->getPacket(&difop_packet_msg, config_.time_offset);
+//     if (rc == 0)
+//     {
+//       // std::cout << "Publishing a difop data." << std::endl;
+//       ROS_DEBUG("Publishing a difop data.");
+//       *difop_packet_ptr = difop_packet_msg;
+//       difop_output_.publish(difop_packet_ptr);
+//     }
+//     if (rc < 0)
+//       return;  // end of file reached?
+//     ros::spinOnce();
+//   }
+// }
 
 void rslidarDriver::callback(rslidar_driver::rslidarNodeConfig& config, uint32_t level)
 {

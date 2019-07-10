@@ -68,15 +68,15 @@ private:
   boost::shared_ptr<Input> msop_input_;
   boost::shared_ptr<Input> difop_input_;
   // ros::Publisher msop_output_;
-  ros::Publisher difop_output_;
+  // ros::Publisher difop_output_;
 
   // Converter convtor_;
   /** diagnostics updater */
-  diagnostic_updater::Updater diagnostics_;
-  double diag_min_freq_;
-  double diag_max_freq_;
-  boost::shared_ptr<diagnostic_updater::TopicDiagnostic> diag_topic_;
-  boost::shared_ptr<boost::thread> difop_thread_;
+  // diagnostic_updater::Updater diagnostics_;
+  // double diag_min_freq_;
+  // double diag_max_freq_;
+  // boost::shared_ptr<diagnostic_updater::TopicDiagnostic> diag_topic_;
+  // boost::shared_ptr<boost::thread> difop_thread_;
 
   // add rawdata by rjp
   

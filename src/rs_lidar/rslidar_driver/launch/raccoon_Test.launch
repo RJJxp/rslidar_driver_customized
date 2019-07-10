@@ -17,7 +17,7 @@
   <arg name="output_pointcloud_topic" default="rslidar_points" />
   <arg name="subscribe_msop_packets" default="$(arg msop_output_packets)" />
   <arg name="subscribe_difop_packets" default="$(arg difop_output_packets)" />
-  <arg name="lidar_param_path" default="$(find rslidar_pointcloud)/data/rs_lidar_16/"/>
+  <arg name="lidar_param_path" default="$(find rslidar_driver)/data/rs_lidar_16/"/>
 
   <node  name="driver_node" pkg="rslidar_driver" type="rslidar_node" output="screen" >
     <param name="model" value="$(arg model)"/>

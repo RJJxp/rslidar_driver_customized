@@ -35,7 +35,7 @@ find_package(PkgConfig REQUIRED)
 
 
 include_directories(${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS}
-	${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
+  ${dynamic_reconfigure_PACKAGE_PATH}/cmake/cfgbuild.cmake)
 
 generate_dynamic_reconfigure_options(cfg/rslidarNode.cfg)
 
@@ -45,3 +45,7 @@ catkin_package(
     )
 
 add_subdirectory(src)
+
+install(DIRECTORY launch
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)

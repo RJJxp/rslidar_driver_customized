@@ -19,6 +19,21 @@
  */
 #include "rawdata.h"
 
+namespace rslidar_rawdata {
+    float VERT_ANGLE[32];
+    float HORI_ANGLE[32];
+    float aIntensityCal[7][32];
+    float aIntensityCal_old[1600][32];
+    bool Curvesis_new = true;
+    int g_ChannelNum[32][51];
+    float CurvesRate[32];
+
+    float temper = 31.0;
+    int tempPacketNum = 0;
+    int numOfLasers = 16;
+    int TEMPERATURE_RANGE = 40;
+}
+
 namespace rslidar_rawdata
 {
 RawData::RawData()
